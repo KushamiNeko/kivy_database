@@ -36,6 +36,10 @@ from kivy.uix.label import Label
 from kivy.uix.button import Button
 from kivy.uix.popup import Popup
 
+from kivy.uix.behaviors import FocusBehavior
+
+from kivy.graphics import Color, Rectangle
+
 from kivy.properties import ListProperty
 from kivy.properties import StringProperty
 
@@ -118,9 +122,15 @@ class DataPopUp(Popup):
             data[i] = value if value else None
 
         db_interface.add_data(data)
+
+        self.parent_window.update_data()
+
         self.dismiss()
 
     def edit_data(self):
+
+        self.parent_window.update_data()
+
         self.dismiss()
 
 
@@ -141,42 +151,80 @@ class DataPopUpRow(BoxLayout):
         return self.ids['data_input'].text
 
 
-class ConfirmationPopUp(Popup):
+class DeleteConfirmationPopUp(Popup):
 
     answer = False
 
-    def __init__(self, **kargs):
-        super(ConfirmationPopUp, self).__init__(**kargs)
+    def __init__(self, parent, data_row, db, collection, **kargs):
+        self.parent_window = parent
+        self.data_row = data_row
+        self.db = db
+        self.db_collection = collection
+
+        super(DeleteConfirmationPopUp, self).__init__(**kargs)
 
     def dismiss(self, answer=False):
         self.answer = answer
 
-        if self.answer:
-            print("do something")
+        if self.answer and self.data_row.datas:
+            #print("do something")
 
-        super(ConfirmationPopUp, self).dismiss()
+            db_interface = MongoInterface(self.db, self.db_collection)
+            db_interface.delete_data(self.data_row.datas)
+
+            # db_interface.add_data(data)
+
+        self.parent_window.update_data()
+        super(DeleteConfirmationPopUp, self).dismiss()
+
+
+class FocusWithColor(FocusBehavior):
+
+    _color = None
+    _rect = None
+
+    def __init__(self, **kargs):
+        super(FocusWithColor, self).__init__(**kargs)
+
+        with self.canvas:
+            self._color = Color(1, 1, 1, 0.0)
+            self._rect = Rectangle(size=self.size,
+                                   pos=self.pos)
+
+            self.bind(size=self._update_rect, pos=self._update_rect)
+
+    def _update_rect(self, instance, value):
+        self._rect.pos = instance.pos
+        self._rect.size = instance.size
+
+    def on_focus(self, instance, value, *largs):
+        self._color.rgba = [0.8, 0.2, 0.2, 0.1] if value else [1, 1, 1, 0.0]
 
 
 class CategoryAreaRow(BoxLayout):
     pass
 
 
-class DataAreaRow(BoxLayout):
+class DataAreaRow(FocusWithColor, BoxLayout):
 
-    # layout = BoxLayout(id="data_row_{}".format(str(i)),
-    #                    orientation='horizontal',
-    #                    size_hint_x=1,
-    #                    size_hint_y=1,
-    #                    spacing=2)
-
-    def __init__(self, parent, categories, datas, **kargs):
+    def __init__(self, top_window, parent, categories, datas, **kargs):
         super(DataAreaRow, self).__init__(**kargs)
+
+        #self.unfocus_on_touch = True
+
+        self.top_window = top_window
+        self.parent_window = parent
 
         self.orientation = 'horizontal'
         self.size_hint = (1, 1)
         self.spacing = 2
 
+        self.categories = categories
+        self.datas = datas
+
         self.data_labels = []
+
+        #self.current_focus = None
 
         for j in range(0, len(categories)):
 
@@ -204,6 +252,9 @@ class DataAreaRow(BoxLayout):
 
     def set_data(self, categories, datas):
 
+        self.categories = categories
+        self.datas = datas
+
         for j in range(0, len(categories)):
 
             text = ''
@@ -219,6 +270,23 @@ class DataAreaRow(BoxLayout):
                     pass
 
             self.data_labels[j].text = text
+
+    def on_focused(self, instance, value, *largs):
+
+        #self.current_focus = instance
+        # instance.data_for_db()
+        # print(self.parent_window.data_row_focused)
+
+        if value:
+            self.top_window.data_row_focused = instance
+            # print(self.parent_window.data_row_focused)
+
+        for i in self.data_labels:
+            if value:
+                i.bg_color = self._color.rgba
+
+            else:
+                i.bg_color = [0.15, 0.15, 0.15, 1]
 
 
 class ManagementWindow(BoxLayout):
@@ -249,6 +317,8 @@ class ManagementWindow(BoxLayout):
         self.rows_per_page = 15
 
         self.data_rows = []
+
+        self.data_row_focused = None
 
         # call super class init method after initializing all the
         # variable we need
@@ -303,7 +373,7 @@ class ManagementWindow(BoxLayout):
             except IndexError:
                 datas = None
 
-            data_row = DataAreaRow(self.ids['data_area'],
+            data_row = DataAreaRow(self, self.ids['data_area'],
                                    self.collection_categories,
                                    datas)
 
@@ -329,16 +399,37 @@ class ManagementWindow(BoxLayout):
 
             # self.ids['data_area'].add_widget(layout)
 
-    def update_data(self, row=None, field=None):
-        pass
+        # self.update_data()
+
+    def update_data(self):
+
+        db_collection = MongoInterface(self.client_db,
+                                       self.current_collection)
+
+        collection_datas = db_collection.find_data()
+
+        for i in range(0, self.rows_per_page):
+
+            try:
+                datas = collection_datas[i]
+            except IndexError:
+                datas = None
+
+            self.data_rows[i].set_data(
+                self.collection_categories,
+                datas)
 
     def show_data_popup(self, title, operation):
         p = DataPopUp(title, self, 'add', self.client_db,
                       self.current_collection, self.collection_categories)
         p.open()
 
-    def show_confirmation_popup(self):
-        p = ConfirmationPopUp()
+    def show_delete_popup(self):
+        p = DeleteConfirmationPopUp(self,
+                                    self.data_row_focused,
+                                    self.client_db,
+                                    self.current_collection)
+
         p.open()
 
 

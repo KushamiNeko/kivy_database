@@ -9,7 +9,7 @@
       pos: self.pos
       size: self.size
 
-<ConfirmationPopUp>:
+<DeleteConfirmationPopUp>:
   size_hint: 0.3, 0.2
   auto_dismiss: False
   title: 'ARE YOU SURE?'
@@ -88,7 +88,7 @@
     Button:
       text: 'delete'
       background_color: 0.8, 0.2, 0.2, 1
-      on_press: root.show_confirmation_popup()
+      on_press: root.show_delete_popup()
 
   BoxLayout:
     id: category_row
