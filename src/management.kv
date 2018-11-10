@@ -1,128 +1,129 @@
-#: kivy 1.9.1
-
-<CustomLabel>:
-  canvas.before:
-    Color:
-      rgba: self.bg_color
-
-    Rectangle:
-      pos: self.pos
-      size: self.size
-
-<DeleteConfirmationPopUp>:
-  size_hint: 0.3, 0.2
-  auto_dismiss: False
-  title: 'ARE YOU SURE?'
-  title_size: 16
-  title_align: 'center'
-  separator_height: 3
-  padding: 2
-
-  BoxLayout:
-    orientation: 'horizontal'
-    spacing: 2
-
-    Button:
-      text: "I AM SURE!!"
-      background_color: 0.8, 0.2, 0.2, 1
-      on_press: root.dismiss(answer=True)
-    
-    Button:
-      text: "Cancel"
-      on_press: root.dismiss()
-
-<DataPopUp>:
-  size_hint: 0.75, 0.75
-  auto_dismiss: False
-  title_size: 16
-  title_align: 'center'
-  padding: 2
-  
-  BoxLayout:
-    id: data_popup_rows
-    orientation: 'vertical'
-    spacing: 2
-
-<DataPopUpRow>:
-  orientation: 'horizontal'
-  size_hint_x: 1
-  size_hint_y: 1
-  spacing: 2
-
-  CustomLabel:
-    text: root.field_name
-    size_hint: 0.4, 1
-    bg_color: (0.1, 0.25, 0.4, 1)
-
-  TextInput:
-    id: data_input
-
-
-<ManagementWindow>:
-  orientation: 'vertical'
-  size_hint_x: 1
-  size_hint_y: 1
-  spacing: 2
-  padding: 2
-
-  BoxLayout:
-    id: button_row
-    orientation: 'horizontal'
-    size_hint: 1, 0.05
-    spacing: 2
-
-    Spinner:
-      text: root.tables[0]
-      values: root.tables
-      background_color: 0.8, 0.8, 0.5, 1
-
-    Button:
-      text: 'Add'
-      background_color: 0.3, 0.6, 0.3, 1
-      on_press: root.show_data_popup(title='Add Data', operation='add')
-
-    Button:
-      text: 'Edit'
-      on_press: root.show_data_popup(title='Edit Data', operation='edit')
-
-    Button:
-      text: 'delete'
-      background_color: 0.8, 0.2, 0.2, 1
-      on_press: root.show_delete_popup()
-
-  BoxLayout:
-    id: category_row
-    orientation: 'horizontal'
-    size_hint: 1, 0.05
-    spacing: 2
-
-  BoxLayout:
-    id: data_area
-    orientation: 'vertical'
-    size_hint_x: 1
-    size_hint_y: 1
-    spacing: 2
-
-  BoxLayout:
-    id: page_control_row
-    orientation: 'horizontal'
-    size_hint: 1, 0.05
-    spacing: 2
-
-    Button:
-      text: 'First Page'
-      on_press: print('First Page')
-
-    Button:
-      text: 'Previous Page'
-      on_press: print('Previous Page')
-
-    Button:
-      text: 'Next Page'
-      on_press: print('Next Page')
-
-    Button:
-      text: 'Last Page'
-      on_press: print('Last Page')
-
-
+##: kivy 1.9.1
+#
+#<CustomLabel>:
+#  canvas.before:
+#    Color:
+#      rgba: self.bg_color
+#
+#    Rectangle:
+#      pos: self.pos
+#      size: self.size
+#
+#<DeleteConfirmationPopUp>:
+#  size_hint: 0.3, 0.2
+#  auto_dismiss: False
+#  title: 'ARE YOU SURE?'
+#  title_size: 16
+#  title_align: 'center'
+#  separator_height: 3
+#  padding: 2
+#
+#  BoxLayout:
+#    orientation: 'horizontal'
+#    spacing: 2
+#
+#    Button:
+#      text: "I AM SURE!!"
+#      background_color: 0.8, 0.2, 0.2, 1
+#      on_press: root.dismiss(answer=True)
+#    
+#    Button:
+#      text: "Cancel"
+#      on_press: root.dismiss()
+#
+#<DataPopUp>:
+#  size_hint: 0.75, 0.75
+#  auto_dismiss: False
+#  title_size: 16
+#  title_align: 'center'
+#  padding: 2
+#  
+#  BoxLayout:
+#    id: data_popup_rows
+#    orientation: 'vertical'
+#    spacing: 2
+#
+#<DataPopUpRow>:
+#  orientation: 'horizontal'
+#  size_hint_x: 1
+#  size_hint_y: 1
+#  spacing: 2
+#
+#  CustomLabel:
+#    text: root.field_name
+#    size_hint: 0.4, 1
+#    bg_color: (0.1, 0.25, 0.4, 1)
+#
+#  TextInput:
+#    id: data_input
+#
+#
+#<ManagementWindow>:
+#  orientation: 'vertical'
+#  size_hint_x: 1
+#  size_hint_y: 1
+#  spacing: 2
+#  padding: 2
+#
+#  BoxLayout:
+#    id: button_row
+#    orientation: 'horizontal'
+#    size_hint: 1, 0.05
+#    spacing: 2
+#
+#    Spinner:
+#      text: root.tables[0]
+#      on_text: root.change_collection(self.text)
+#      values: root.tables
+#      background_color: 0.8, 0.8, 0.5, 1
+#
+#    Button:
+#      text: 'Add'
+#      background_color: 0.3, 0.6, 0.3, 1
+#      on_press: root.show_data_popup(title='Add Data', operation='add')
+#
+#    Button:
+#      text: 'Edit'
+#      on_press: root.show_data_popup(title='Edit Data', operation='edit')
+#
+#    Button:
+#      text: 'delete'
+#      background_color: 0.8, 0.2, 0.2, 1
+#      on_press: root.show_delete_popup()
+#
+#  BoxLayout:
+#    id: category_row
+#    orientation: 'horizontal'
+#    size_hint: 1, 0.05
+#    spacing: 2
+#
+#  BoxLayout:
+#    id: data_area
+#    orientation: 'vertical'
+#    size_hint_x: 1
+#    size_hint_y: 1
+#    spacing: 2
+#
+#  BoxLayout:
+#    id: page_control_row
+#    orientation: 'horizontal'
+#    size_hint: 1, 0.05
+#    spacing: 2
+#
+#    Button:
+#      text: 'First Page'
+#      on_press: print('First Page')
+#
+#    Button:
+#      text: 'Previous Page'
+#      on_press: print('Previous Page')
+#
+#    Button:
+#      text: 'Next Page'
+#      on_press: print('Next Page')
+#
+#    Button:
+#      text: 'Last Page'
+#      on_press: print('Last Page')
+#
+#
